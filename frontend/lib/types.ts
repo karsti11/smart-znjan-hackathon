@@ -127,6 +127,43 @@ export interface IrrigationZone {
   schedule: string;
 }
 
+export interface ParkingHeatmap {
+  grid: number[][];        // [7][24]
+  by_hour: number[];       // 24
+  by_dow: number[];        // 7
+  busiest_hour: number;
+  busiest_dow: number;     // 0 = Monday
+  max_cell: number;
+  total_events: number;
+}
+
+export interface CategoryCount {
+  category: string;
+  count: number;
+  pct: number;
+}
+
+export interface CategoryDistribution {
+  total: number;
+  items: CategoryCount[];
+}
+
+export interface LocationStat {
+  location: string;
+  count: number;
+  avg_priority: number;
+  severity_breakdown: { low: number; medium: number; high: number; critical: number };
+  top_category: string;
+  cleanliness_score: number;
+}
+
+export interface AdminStats {
+  parking_heatmap: ParkingHeatmap;
+  categories: CategoryDistribution;
+  top_locations: { items: LocationStat[] };
+  period_days: number;
+}
+
 export interface AdminKpis {
   total_users: number;
   citizens: number;

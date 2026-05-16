@@ -1,5 +1,6 @@
 import type {
   AdminKpis,
+  AdminStats,
   Court,
   Issue,
   IssueCreateRequest,
@@ -91,4 +92,5 @@ export const api = {
 
   // admin
   kpis: () => jsonFetch<AdminKpis>(`${BASE}/admin/kpis`),
+  stats: (days = 14) => jsonFetch<AdminStats>(`${BASE}/admin/stats?days=${days}`),
 };

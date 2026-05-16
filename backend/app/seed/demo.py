@@ -1,6 +1,7 @@
 """Idempotent demo seeder for Smart Žnjan."""
 from __future__ import annotations
 
+import random
 from datetime import datetime, timedelta
 
 from sqlalchemy import select
@@ -206,6 +207,152 @@ def _ensure_reservations(db: Session) -> None:
     ))
 
 
+# ── Rich history for analytics (parking heatmap, top locations, categories) ──
+
+# Locations with deliberate cleanliness gradient — Promenada and main parking
+# generate the most reports (worst score); Sportski centar is mid; Plaža zapad
+# and Plato are cleanest. This produces a meaningful "top problematic locations" chart.
+_HISTORY_LOCATIONS = [
+    ("Šetalište pape Ivana Pavla II, kod kioska",  ["smeće", "smeće", "smeće", "smeće", "vandalizam", "rasvjeta", "infrastruktura"]),
+    ("Promenada, sredina",                          ["rasvjeta", "rasvjeta", "rasvjeta", "smeće", "smeće", "vandalizam"]),
+    ("Glavni parking — sjeverni ulaz",              ["smeće", "smeće", "parking", "parking", "rasvjeta"]),
+    ("Sportski centar Žnjan",                       ["voda", "voda", "infrastruktura", "smeće"]),
+    ("Odbojka na pijesku",                          ["smeće", "smeće", "životinje"]),
+    ("Park — sjeverni dio",                         ["zelenilo", "zelenilo", "smeće"]),
+    ("Padel tereni — ulaz",                         ["rasvjeta", "infrastruktura"]),
+    ("Plaža zapad",                                 ["smeće"]),
+    ("Plato istok",                                 ["buka"]),
+]
+
+_DEPT_BY_CAT = {
+    "smeće":         "Čistoća d.o.o. Split",
+    "rasvjeta":      "Javna rasvjeta — Grad Split",
+    "vandalizam":    "Komunalno redarstvo",
+    "infrastruktura":"Komunalno gospodarstvo",
+    "zelenilo":      "Parkovi i nasadi d.o.o.",
+    "voda":          "Vodovod i kanalizacija d.o.o.",
+    "parking":       "Split parking d.o.o.",
+    "buka":          "Komunalno redarstvo",
+    "životinje":     "Veterinarska stanica",
+    "ostalo":        "Komunalno redarstvo",
+}
+
+_SEVERITY_BY_CAT = {
+    "smeće":          [("medium", 55), ("medium", 60), ("high", 75), ("low", 25)],
+    "rasvjeta":       [("medium", 50), ("medium", 55), ("high", 70)],
+    "vandalizam":     [("high", 75), ("medium", 60)],
+    "infrastruktura": [("high", 70), ("critical", 90)],
+    "zelenilo":       [("low", 25), ("medium", 45)],
+    "voda":           [("critical", 92), ("high", 80)],
+    "parking":        [("medium", 50), ("low", 30)],
+    "buka":           [("low", 30), ("medium", 45)],
+    "životinje":      [("medium", 55)],
+}
+
+_DESC_BY_CAT = {
+    "smeće":          "Prepuni kontejneri / razbacano smeće, treba intervencija ekipe za čišćenje.",
+    "rasvjeta":       "Ulična lampa ne radi, mračno je u večernjim satima.",
+    "vandalizam":     "Šarani su zidovi i klupe, nepoznati počinitelji.",
+    "infrastruktura":"Oštećen pločnik / oprema, opasno za korisnike.",
+    "zelenilo":       "Suho granje i nepokošena trava — potrebno održavanje.",
+    "voda":           "Curi voda iz kanalizacije ili razvodne mreže.",
+    "parking":        "Nepropisno parkiranje zauzima više mjesta.",
+    "buka":           "Glasna glazba u kasnim satima, smetnja stanarima.",
+    "životinje":      "Galebovi rasturaju vreće sa smećem.",
+}
+
+
+def _ensure_rich_history(db: Session) -> None:
+    """Seed ~40 issues spread across 14 days and ~200 parking-time loyalty events.
+
+    Idempotent: keyed off the deterministic id prefix `iss_h_` / `le_h_`.
+    Re-running adds nothing if already present.
+    """
+    if db.execute(select(Issue).where(Issue.id.like("iss_h_%"))).first():
+        return
+
+    rng = random.Random(42)
+    now = datetime.utcnow()
+    citizen_ids = ["usr_ana", "usr_ivan"]
+
+    # ── 40 issues distributed across the gradient + last 14 days
+    n_issues = 0
+    for days_back in range(14):
+        for loc, cat_pool in _HISTORY_LOCATIONS:
+            # high-volume locations show up more often
+            if rng.random() < (0.18 + 0.05 * (len(cat_pool) / 7)):
+                cat = rng.choice(cat_pool)
+                sev, prio = rng.choice(_SEVERITY_BY_CAT[cat])
+                created = now - timedelta(
+                    days=days_back,
+                    hours=rng.randint(6, 22),
+                    minutes=rng.randint(0, 59),
+                )
+                # 60% of issues older than 3 days are resolved
+                status = "open"
+                if days_back >= 3 and rng.random() < 0.65:
+                    status = "resolved"
+                elif days_back >= 1 and rng.random() < 0.20:
+                    status = "in_progress"
+                uid = rng.choice(citizen_ids)
+                points = {"low": 15, "medium": 30, "high": 40, "critical": 50}[sev]
+                db.add(Issue(
+                    id=f"iss_h_{n_issues:03d}",
+                    user_id=uid,
+                    description=_DESC_BY_CAT[cat] + f" Lokacija: {loc}.",
+                    location_hint=loc,
+                    photo_data_url=None,
+                    category=cat,
+                    severity=sev,
+                    priority_score=prio,
+                    suggested_department=_DEPT_BY_CAT[cat],
+                    ai_summary=f"Prijava ({cat}) na lokaciji '{loc}'.",
+                    ai_grounded=True,
+                    status=status,
+                    points_awarded=points,
+                    created_at=created,
+                    updated_at=created if status == "open" else created + timedelta(hours=rng.randint(2, 36)),
+                ))
+                n_issues += 1
+
+    # ── parking events with realistic time-of-day distribution
+    # Morning peak 8-10, evening peak 17-20, day-of-week effect (weekends busier)
+    hour_weights = [
+        0.2, 0.1, 0.1, 0.1, 0.1, 0.3,  # 0-5
+        0.6, 1.4, 2.6, 2.4, 1.8, 1.4,  # 6-11
+        1.6, 1.4, 1.2, 1.4, 1.8, 2.6,  # 12-17
+        3.0, 2.8, 2.2, 1.6, 0.9, 0.5,  # 18-23
+    ]
+    dow_weights = [1.0, 1.0, 1.0, 1.1, 1.4, 1.8, 1.6]  # Mon..Sun
+    lot_ids = ["park_zn1", "park_zn2", "park_zn3", "park_zn4"]
+    # busier lots: zn1 (Glavni) and zn4 (Plaža)
+    lot_weights = [3.0, 1.8, 1.2, 2.4]
+
+    n = 0
+    for days_back in range(14):
+        d = now - timedelta(days=days_back)
+        dow = d.weekday()
+        target = int(round(14 * dow_weights[dow]))
+        for _ in range(target):
+            # sample hour
+            h = rng.choices(range(24), weights=hour_weights, k=1)[0]
+            minute = rng.randint(0, 59)
+            lot = rng.choices(lot_ids, weights=lot_weights, k=1)[0]
+            uid = rng.choice(citizen_ids)
+            hours = rng.choice([1, 1, 2, 2, 2, 3, 4])
+            cost_eur = round(1.5 * hours, 2)  # approximate
+            ts = (now - timedelta(days=days_back)).replace(hour=h, minute=minute, second=0, microsecond=0)
+            db.add(LoyaltyEvent(
+                id=f"le_h_{n:04d}",
+                user_id=uid,
+                kind="parking",
+                delta_points=max(1, int(round(cost_eur * 10))),
+                note=f"Parking {lot} ({hours}h, {cost_eur:.2f}€)",
+                created_at=ts,
+            ))
+            n += 1
+
+
 def seed_all(db: Session) -> None:
     _ensure_users(db)
     _ensure_parking(db)
@@ -215,4 +362,5 @@ def seed_all(db: Session) -> None:
     _ensure_issues(db)
     _ensure_loyalty(db)
     _ensure_reservations(db)
+    _ensure_rich_history(db)
     db.commit()

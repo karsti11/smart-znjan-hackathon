@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BarChart3,
   CircleParking,
   Lightbulb,
   LayoutDashboard,
@@ -32,6 +33,7 @@ const STAFF_NAV = [
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/statistika", label: "Statistika", icon: BarChart3 },
   { href: "/admin/loyalty", label: "Loyalty pregled", icon: Trophy },
   { href: "/admin/sustav", label: "Sustav", icon: Sparkles },
 ];

@@ -192,3 +192,48 @@ class AdminKpis(BaseModel):
     active_lights: int
     energy_kw: float
     total_points_circulating: int
+
+
+# ── Analytics ────────────────────────────────────────────────────────────────
+
+
+class ParkingHeatmap(BaseModel):
+    """7×24 grid of parking-event counts (rows: Mon..Sun, cols: 00..23h)."""
+    grid: list[list[int]]
+    by_hour: list[int]          # 24 totals
+    by_dow: list[int]           # 7 totals
+    busiest_hour: int
+    busiest_dow: int            # 0=Mon
+    max_cell: int
+    total_events: int
+
+
+class CategoryCount(BaseModel):
+    category: str
+    count: int
+    pct: float
+
+
+class CategoryDistribution(BaseModel):
+    total: int
+    items: list[CategoryCount]
+
+
+class LocationStat(BaseModel):
+    location: str
+    count: int
+    avg_priority: float
+    severity_breakdown: dict[str, int]   # {low: n, medium: n, high: n, critical: n}
+    top_category: str
+    cleanliness_score: int               # 0-100, 100 = best
+
+
+class TopLocations(BaseModel):
+    items: list[LocationStat]
+
+
+class AdminStats(BaseModel):
+    parking_heatmap: ParkingHeatmap
+    categories: CategoryDistribution
+    top_locations: TopLocations
+    period_days: int
