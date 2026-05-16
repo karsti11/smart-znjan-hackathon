@@ -83,7 +83,7 @@ COACH_TOOL: dict[str, Any] = {
                 "items": {"type": "string"},
                 "minItems": 2,
                 "maxItems": 3,
-                "description": "Personalizirane preporuke (npr. 'Iskoristi 200 bodova za sat padela')",
+                "description": "Personalizirane preporuke (npr. 'Iskoristi 200 bodova za sat tenisa')",
             },
             "next_milestone_points": {
                 "type": "integer",
@@ -167,7 +167,7 @@ def _heuristic_coach(user: UserOut, events: list[dict[str, Any]]) -> LoyaltyCoac
     )
     recs: list[str] = []
     if user.points >= 200:
-        recs.append("Iskoristite 200 bodova za sat padela na terenu Žnjan 1.")
+        recs.append("Iskoristite 200 bodova za sat tenisa na terenu Žnjan A.")
     recs.append("Prijavite još jedno smeće na plaži — svaka prijava nosi 30 bodova.")
     if n_reservations == 0:
         recs.append("Probajte rezervirati teren u jutarnjem terminu (popust 20 %).")

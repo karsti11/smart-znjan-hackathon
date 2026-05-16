@@ -41,7 +41,6 @@ const CATEGORY_LABEL: Record<string, string> = {
 };
 
 const SPORT_EMOJI: Record<string, string> = {
-  padel: "🎾",
   tenis: "🎾",
   košarka: "🏀",
   nogomet: "⚽",

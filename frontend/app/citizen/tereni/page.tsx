@@ -22,7 +22,6 @@ import { cn, formatEur, formatPoints } from "@/lib/utils";
 
 
 const SPORT_LABEL: Record<string, string> = {
-  padel: "Padel",
   tenis: "Tenis",
   košarka: "Košarka",
   nogomet: "Mali nogomet",
@@ -113,7 +112,7 @@ export default function TereniPage() {
           <Badge tone="teal" className="mb-3"><Volleyball className="h-3 w-3" /> Sportski tereni</Badge>
           <h1 className="text-3xl font-semibold text-ink-50 tracking-tight">Rezerviraj svoj termin</h1>
           <p className="text-sm text-ink-200/80 mt-1">
-            Padel, tenis, košarka, mali nogomet, odbojka — sve u srcu Žnjana.
+            Tenis, košarka, mali nogomet, odbojka — sve u srcu Žnjana.
           </p>
         </div>
         {user && (

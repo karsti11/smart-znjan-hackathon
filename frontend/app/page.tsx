@@ -100,7 +100,7 @@ export default function Home() {
           href="/citizen/tereni"
           icon={Volleyball}
           title="Sportski tereni"
-          desc="Rezerviraj padel, tenis, košarku, mali nogomet."
+          desc="Rezerviraj tenis, košarku, mali nogomet, odbojku."
         />
         <ModuleCard
           href="/citizen/prijava"

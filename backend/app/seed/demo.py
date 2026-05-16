@@ -57,24 +57,12 @@ PARKING_LOTS = [
         "id": "park_zn4", "name": "Žnjan — Plaža zapad",
         "address": "Šetalište pape Ivana Pavla II 35",
         "capacity": 60, "occupied": 60,
-        "price_per_hour_eur": 1.80,
+        "price_per_hour_eur": 1.50,
         "lat": ZNJAN_LAT + 0.0015, "lng": ZNJAN_LNG - 0.0040,
     },
 ]
 
 COURTS = [
-    {
-        "id": "court_padel1", "name": "Padel Žnjan 1",
-        "sport": "padel", "surface": "umjetna trava",
-        "price_per_hour_eur": 16.0, "has_lights": True,
-        "lat": ZNJAN_LAT - 0.0005, "lng": ZNJAN_LNG + 0.0015,
-    },
-    {
-        "id": "court_padel2", "name": "Padel Žnjan 2",
-        "sport": "padel", "surface": "umjetna trava",
-        "price_per_hour_eur": 16.0, "has_lights": True,
-        "lat": ZNJAN_LAT - 0.0005, "lng": ZNJAN_LNG + 0.0018,
-    },
     {
         "id": "court_tenis1", "name": "Tenis Žnjan A",
         "sport": "tenis", "surface": "šljaka",
@@ -188,7 +176,7 @@ def _ensure_loyalty(db: Session) -> None:
     events = [
         ("le_001", "usr_ana", "report", 30, "Prijava: prepuni kontejneri", now - timedelta(days=4)),
         ("le_002", "usr_ana", "report", 50, "Prijava: razbijeno staklo (kritično)", now - timedelta(days=2)),
-        ("le_003", "usr_ana", "reservation", 80, "Padel Žnjan 1, 60 min", now - timedelta(days=1)),
+        ("le_003", "usr_ana", "reservation", 60, "Tenis Žnjan A, 60 min", now - timedelta(days=1)),
         ("le_004", "usr_ana", "parking", 15, "Žnjan plato istok, 2 sata", now - timedelta(hours=6)),
         ("le_005", "usr_ivan", "report", 30, "Prijava: rasvjeta promenada", now - timedelta(days=1)),
     ]
@@ -201,9 +189,9 @@ def _ensure_reservations(db: Session) -> None:
         return
     now = datetime.utcnow()
     db.add(Reservation(
-        id="rsv_seed_1", user_id="usr_ana", court_id="court_padel1",
+        id="rsv_seed_1", user_id="usr_ana", court_id="court_tenis1",
         starts_at=now - timedelta(days=1, hours=2), ends_at=now - timedelta(days=1, hours=1),
-        paid_eur=16.0, paid_points=0, status="completed",
+        paid_eur=12.0, paid_points=0, status="completed",
     ))
 
 
@@ -219,7 +207,6 @@ _HISTORY_LOCATIONS = [
     ("Sportski centar Žnjan",                       ["voda", "voda", "infrastruktura", "smeće"]),
     ("Odbojka na pijesku",                          ["smeće", "smeće", "životinje"]),
     ("Park — sjeverni dio",                         ["zelenilo", "zelenilo", "smeće"]),
-    ("Padel tereni — ulaz",                         ["rasvjeta", "infrastruktura"]),
     ("Plaža zapad",                                 ["smeće"]),
     ("Plato istok",                                 ["buka"]),
 ]
@@ -356,12 +343,10 @@ def _ensure_rich_history(db: Session) -> None:
 # Court reservation history — feeds the citizen "kad su tereni najtraženiji" view.
 # Per-court popularity weights + peak-hour pool produce realistic demand curves.
 _COURT_HISTORY = {
-    "court_padel1":       (14, [17, 18, 18, 19, 19, 19, 20, 20, 21, 9, 10]),
-    "court_padel2":       (12, [17, 18, 19, 19, 20, 20, 21, 8, 10]),
-    "court_tenis1":       (9,  [10, 11, 17, 17, 18, 19]),
-    "court_basket":       (6,  [16, 17, 18, 19, 19]),
-    "court_odbojka":      (5,  [10, 11, 17, 18, 19]),
-    "court_mali_nogomet": (11, [18, 19, 20, 20, 21]),
+    "court_tenis1":       (16, [10, 11, 17, 17, 18, 18, 19, 19, 20]),
+    "court_basket":       (10, [16, 17, 18, 19, 19, 20]),
+    "court_odbojka":      (8,  [10, 11, 17, 18, 19]),
+    "court_mali_nogomet": (16, [18, 19, 20, 20, 21]),
 }
 
 

@@ -25,7 +25,6 @@ router = APIRouter(prefix="/api/v1/insights", tags=["insights"])
 DOW_LABEL = ["pon", "uto", "sri", "čet", "pet", "sub", "ned"]
 
 SPORT_LABEL = {
-    "padel": "Padel",
     "tenis": "Tenis",
     "košarka": "Košarka",
     "nogomet": "Mali nogomet",

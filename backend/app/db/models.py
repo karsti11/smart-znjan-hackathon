@@ -41,7 +41,7 @@ class Court(Base):
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     name: Mapped[str] = mapped_column(String(128))
-    sport: Mapped[str] = mapped_column(String(32))  # padel | tenis | nogomet | košarka | odbojka
+    sport: Mapped[str] = mapped_column(String(32))  # tenis | nogomet | košarka | odbojka
     surface: Mapped[str] = mapped_column(String(32))
     price_per_hour_eur: Mapped[float] = mapped_column(Float)
     has_lights: Mapped[bool] = mapped_column(Boolean, default=True)
