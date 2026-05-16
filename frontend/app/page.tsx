@@ -3,29 +3,24 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  Activity,
   ArrowRight,
   CircleParking,
   Megaphone,
   Sparkles,
   Trophy,
   Volleyball,
-  Waves,
 } from "lucide-react";
 
-import { Badge, Card, CardContent, Metric } from "@/components/ui";
+import { Badge, Card, CardContent } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useRole } from "@/lib/role-context";
-import type { AdminKpis } from "@/lib/types";
 import { formatPoints } from "@/lib/utils";
 
 export default function Home() {
   const { user, role } = useRole();
-  const [kpis, setKpis] = useState<AdminKpis | null>(null);
   const [aiReady, setAiReady] = useState<boolean | null>(null);
 
   useEffect(() => {
-    api.kpis().then(setKpis).catch(() => {});
     api.health().then((h) => setAiReady(h.ai)).catch(() => setAiReady(false));
   }, []);
 
@@ -40,10 +35,10 @@ export default function Home() {
           <Sparkles className="h-3 w-3" /> AI hackathon · {aiReady ? "Claude online" : "offline fallback"}
         </Badge>
 
-        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-sand-200 text-balance max-w-2xl drop-shadow-[0_2px_24px_rgba(2,9,26,0.75)]">
-          Pametni Žnjan koji <span className="text-coral-400">diše s gradom</span>.
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white text-balance max-w-2xl drop-shadow-[0_2px_24px_rgba(0,0,0,0.85)]">
+          Pametni Žnjan koji <span className="text-teal-400">diše s gradom</span>.
         </h1>
-        <p className="mt-4 text-sand-200/90 max-w-xl text-balance drop-shadow-[0_1px_8px_rgba(2,9,26,0.8)]">
+        <p className="mt-4 text-white/90 max-w-xl text-balance drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]">
           Parking u stvarnom vremenu, rezervacija sportskih terena, prijava komunalnih problema
           uz AI klasifikaciju i loyalty bodovi koji vraćaju vrijednost građanima.
         </p>
@@ -75,18 +70,14 @@ export default function Home() {
         )}
       </section>
 
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Metric
-          label="Slobodna parking mjesta"
-          value={kpis ? Math.round((100 - kpis.parking_occupancy_pct) * 5) : "—"}
-          sub="Procjena u realnom vremenu"
+      <section className="grid md:grid-cols-3 gap-5">
+        <ModuleCard
+          href="/citizen/prijava"
+          icon={Megaphone}
+          title="Komunalne prijave"
+          desc="Slikaj problem — Claude ga automatski klasificira i usmjerava."
+          highlight
         />
-        <Metric label="Otvorene prijave" value={kpis?.open_issues ?? "—"} tone="coral" />
-        <Metric label="Rezervacije danas" value={kpis?.today_court_reservations ?? "—"} />
-        <Metric label="Bodovi u opticaju" value={kpis ? formatPoints(kpis.total_points_circulating) : "—"} />
-      </section>
-
-      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         <ModuleCard
           href="/citizen/parking"
           icon={CircleParking}
@@ -99,39 +90,6 @@ export default function Home() {
           title="Sportski tereni"
           desc="Rezerviraj tenis, košarku, mali nogomet, odbojku."
         />
-        <ModuleCard
-          href="/citizen/prijava"
-          icon={Megaphone}
-          title="Komunalne prijave"
-          desc="Slikaj problem — Claude ga automatski klasificira i usmjerava."
-          highlight
-        />
-        <ModuleCard
-          href="/citizen/loyalty"
-          icon={Trophy}
-          title="Loyalty"
-          desc="Zaradi bodove i iskoristi ih za parking i terene."
-        />
-        <ModuleCard
-          href="/citizen/zauzetost"
-          icon={Activity}
-          title="Zauzetost & uvidi"
-          desc="Kad su parkinzi puni, koji su tereni najtraženiji, gdje najčešće zovu po popravak."
-        />
-        <Card className="md:col-span-2">
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Waves className="h-4 w-4 text-teal-300" />
-              <h3 className="text-base font-semibold text-ink-50">Kako Smart Žnjan radi</h3>
-            </div>
-            <ol className="text-sm text-ink-200/90 space-y-2 list-decimal list-inside">
-              <li>Građani prijavljuju probleme — <span className="text-teal-300">Claude</span> ih kategorizira i usmjerava na pravi odjel.</li>
-              <li>Komunalna služba vidi prioritiziranu queue i upravlja rasvjetom, navodnjavanjem i terenima.</li>
-              <li>Svaka aktivnost donosi bodove koje gradjani troše na parking ili terene.</li>
-              <li>Gradska uprava prati KPI-eve u stvarnom vremenu i optimizira potrošnju energije.</li>
-            </ol>
-          </CardContent>
-        </Card>
       </section>
     </div>
   );

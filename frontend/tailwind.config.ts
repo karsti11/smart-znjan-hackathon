@@ -21,21 +21,22 @@ const config: Config = {
         ],
       },
       colors: {
-        // Smart Žnjan palette — sunčani Mediteran: bijela, žuta, narančasta
-        // Token names `ink`/`teal` kept for class compatibility, hex values are
-        // now warm neutrals + bright yellow so we don't have to rename usages.
+        // Smart Žnjan palette — strogo 3 boje: bijela, žuta, crna.
+        // Token names `ink`/`teal`/`coral`/`sand` su zadržani zbog kompatibilnosti
+        // s postojećim klasama. Coral i sand sad mapiraju u istu žutu/bijelu
+        // pa nigdje u UI-u nema ni narančaste ni plave.
         ink: {
           50:  "#ffffff",
-          100: "#fff8e7",
-          200: "#f3e7c8",
-          300: "#e6d39c",
-          400: "#c9a86a",
-          500: "#8a6a3a",
-          600: "#5c3f1a",
-          700: "#3a2810",
-          800: "#1f1408",
-          900: "#110a04",
-          950: "#050200",
+          100: "#f5f5f5",
+          200: "#e0e0e0",
+          300: "#b3b3b3",
+          400: "#808080",
+          500: "#555555",
+          600: "#333333",
+          700: "#1a1a1a",
+          800: "#0d0d0d",
+          900: "#050505",
+          950: "#000000",
         },
         teal: {
           300: "#ffe066",
@@ -45,12 +46,12 @@ const config: Config = {
           700: "#b87a00",
         },
         coral: {
-          400: "#ff8a3d",
-          500: "#ff6a1a",
+          400: "#ffd400",
+          500: "#ffb800",
         },
         sand: {
-          200: "#fff4d6",
-          300: "#ffe9a8",
+          200: "#ffffff",
+          300: "#f5f5f5",
         },
       },
       boxShadow: {
@@ -90,7 +91,7 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-night":
-          "radial-gradient(at 18% 4%, rgba(255, 224, 102, 0.18) 0px, transparent 45%), radial-gradient(at 85% 0%, rgba(255, 138, 61, 0.30) 0px, transparent 55%), radial-gradient(at 92% 92%, rgba(255, 184, 0, 0.18) 0px, transparent 55%), linear-gradient(180deg, #110a04 0%, #050200 100%)",
+          "radial-gradient(at 18% 4%, rgba(255, 212, 0, 0.18) 0px, transparent 45%), radial-gradient(at 85% 0%, rgba(255, 184, 0, 0.20) 0px, transparent 55%), radial-gradient(at 92% 92%, rgba(255, 224, 102, 0.14) 0px, transparent 55%), linear-gradient(180deg, #050505 0%, #000000 100%)",
         shimmer:
           "linear-gradient(110deg, rgba(255,224,102,0) 0%, rgba(255,224,102,0.22) 45%, rgba(255,224,102,0) 100%)",
       },
