@@ -1,0 +1,16 @@
+# Force consistent line endings across platforms.
+* text=auto eol=lf
+
+# Windows-only files keep CRLF
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binaries — no diff, no conversion
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.db   binary

@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #04122a;
+  --foreground: #e6edf7;
+  --muted: #9ab1d4;
+  --teal: #3fd5c6;
+}
+
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body {
+  background-image:
+    radial-gradient(at 18% 4%, rgba(63, 213, 198, 0.14) 0px, transparent 45%),
+    radial-gradient(at 85% 0%, rgba(31, 77, 138, 0.55) 0px, transparent 55%),
+    radial-gradient(at 50% 100%, rgba(63, 213, 198, 0.10) 0px, transparent 60%),
+    radial-gradient(at 92% 92%, rgba(255, 138, 91, 0.10) 0px, transparent 55%),
+    linear-gradient(180deg, #04122a 0%, #02091a 100%);
+  background-attachment: fixed;
+}
+
+/* Glass card surface — used by Card primitive */
+@layer components {
+  .glass {
+    @apply bg-white/[0.04] border border-white/10 backdrop-blur-xl;
+    box-shadow:
+      0 6px 28px -10px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .glass-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .glass-hover:hover {
+    @apply bg-white/[0.06] border-white/15;
+    transform: translateY(-2px);
+    box-shadow:
+      0 16px 40px -12px rgba(0, 0, 0, 0.55),
+      0 0 28px rgba(63, 213, 198, 0.15),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .teal-glow {
+    box-shadow: 0 0 24px rgba(63, 213, 198, 0.35), 0 0 60px rgba(63, 213, 198, 0.15);
+  }
+
+  .text-balance { text-wrap: balance; }
+}
+
+/* Sea reflection — subtle moving sheen on the page top */
+.sea-sheen {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 220px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(63, 213, 198, 0.18) 0%, transparent 70%);
+  filter: blur(6px);
+  z-index: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(126, 226, 215, 0.18);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(126, 226, 215, 0.32); }
+
+/* Skeleton shimmer (used in loading states) */
+.shimmer {
+  background: linear-gradient(110deg, rgba(126,226,215,0.05) 8%, rgba(126,226,215,0.18) 18%, rgba(126,226,215,0.05) 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
+/* Focus ring tuned for dark glass */
+:focus-visible {
+  outline: 2px solid rgba(63, 213, 198, 0.7);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
