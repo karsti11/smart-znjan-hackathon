@@ -80,10 +80,10 @@ type BadgeTone = "neutral" | "critical" | "warning" | "info" | "success" | "ai" 
 const BADGE_TONE: Record<BadgeTone, string> = {
   neutral:  "bg-white/[0.06] text-ink-100 border-white/10",
   critical: "bg-rose-500/15 text-rose-200 border-rose-400/30",
-  warning:  "bg-amber-400/15 text-amber-200 border-amber-300/30",
-  info:     "bg-sky-400/15 text-sky-200 border-sky-300/30",
+  warning:  "bg-teal-400/15 text-teal-200 border-teal-300/30",
+  info:     "bg-teal-400/15 text-teal-200 border-teal-300/30",
   success:  "bg-emerald-400/15 text-emerald-200 border-emerald-300/30",
-  ai:       "bg-violet-400/15 text-violet-200 border-violet-300/30",
+  ai:       "bg-teal-400/15 text-teal-200 border-teal-300/30",
   teal:     "bg-teal-400/15 text-teal-200 border-teal-300/30",
 };
 
