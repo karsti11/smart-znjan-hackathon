@@ -66,8 +66,8 @@ const config: Config = {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(63, 213, 198, 0.0)" },
-          "50%": { boxShadow: "0 0 24px 4px rgba(63, 213, 198, 0.35)" },
+          "0%, 100%": { boxShadow: "0 0 14px 1px rgba(63, 213, 198, 0.18)" },
+          "50%":      { boxShadow: "0 0 20px 2px rgba(63, 213, 198, 0.30)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -82,7 +82,7 @@ const config: Config = {
       animation: {
         "fade-in": "fade-in 260ms cubic-bezier(0.4, 0, 0.2, 1) both",
         "slide-up": "slide-up 320ms cubic-bezier(0.4, 0, 0.2, 1) both",
-        "pulse-glow": "pulse-glow 2.4s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 4s ease-in-out infinite",
         shimmer: "shimmer 2.6s linear infinite",
         "wave-slow": "wave-slow 16s ease-in-out infinite",
       },

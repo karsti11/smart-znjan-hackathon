@@ -20,8 +20,8 @@ export function HeroVideo({ className }: { className?: string }) {
       <video
         className={cn(
           "absolute inset-0 w-full h-full object-cover",
-          "opacity-0 animate-[fade-in_900ms_ease-out_forwards] motion-reduce:animate-none",
-          "[animation-delay:120ms]",
+          "opacity-0 transition-opacity duration-700 ease-out",
+          "motion-safe:animate-[hero-pan_48s_ease-in-out_infinite_alternate]",
           className,
         )}
         autoPlay
@@ -32,7 +32,6 @@ export function HeroVideo({ className }: { className?: string }) {
         aria-hidden="true"
         onError={() => setFailed(true)}
         onLoadedData={(e) => { (e.currentTarget as HTMLVideoElement).style.opacity = "1"; }}
-        style={{ transform: "scale(1.05)", animation: "hero-pan 32s ease-in-out infinite alternate" }}
       >
         <source src={VIDEO_URL} type="video/mp4" />
       </video>
