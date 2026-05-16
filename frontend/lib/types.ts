@@ -164,6 +164,43 @@ export interface AdminStats {
   period_days: number;
 }
 
+// ── Citizen insights ─────────────────────────────────────────────────────
+
+export interface CitizenParkingInsights {
+  busiest_hour: number;
+  quietest_hour: number;
+  busiest_dow: number;        // 0 = Monday
+  quietest_dow: number;
+  density_by_hour: number[];  // 24 values, 0-100
+  total_events: number;
+  tip: string;
+}
+
+export interface CourtSportDemand {
+  sport: string;
+  sport_label: string;
+  most_booked_court_id: string;
+  most_booked_court_name: string;
+  peak_hour: number;
+  peak_dow: number;
+  reservation_count: number;
+  tip: string;
+}
+
+export interface CitizenProblemLocation {
+  location: string;
+  cleanliness_score: number;
+  top_issue: string;
+  note: string;
+}
+
+export interface CitizenInsights {
+  parking: CitizenParkingInsights;
+  courts: { items: CourtSportDemand[] };
+  problem_locations: CitizenProblemLocation[];
+  period_days: number;
+}
+
 export interface AdminKpis {
   total_users: number;
   citizens: number;

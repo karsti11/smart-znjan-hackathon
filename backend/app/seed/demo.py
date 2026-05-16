@@ -353,6 +353,56 @@ def _ensure_rich_history(db: Session) -> None:
             n += 1
 
 
+# Court reservation history — feeds the citizen "kad su tereni najtraženiji" view.
+# Per-court popularity weights + peak-hour pool produce realistic demand curves.
+_COURT_HISTORY = {
+    "court_padel1":       (14, [17, 18, 18, 19, 19, 19, 20, 20, 21, 9, 10]),
+    "court_padel2":       (12, [17, 18, 19, 19, 20, 20, 21, 8, 10]),
+    "court_tenis1":       (9,  [10, 11, 17, 17, 18, 19]),
+    "court_basket":       (6,  [16, 17, 18, 19, 19]),
+    "court_odbojka":      (5,  [10, 11, 17, 18, 19]),
+    "court_mali_nogomet": (11, [18, 19, 20, 20, 21]),
+}
+
+
+def _ensure_court_history(db: Session) -> None:
+    if db.execute(select(Reservation).where(Reservation.id.like("rsv_h_%"))).first():
+        return
+    rng = random.Random(43)
+    now = datetime.utcnow()
+    n = 0
+    for court_id, (count, peak_pool) in _COURT_HISTORY.items():
+        court = db.get(Court, court_id)
+        if not court:
+            continue
+        # weekend bias for sport rentals
+        dow_weights = [1.0, 1.0, 1.0, 1.2, 1.6, 2.0, 1.7]
+        for _ in range(count):
+            dow = rng.choices(range(7), weights=dow_weights, k=1)[0]
+            # snap to a day in the last 14 that has this dow
+            base = now - timedelta(days=rng.randint(0, 13))
+            while base.weekday() != dow:
+                base -= timedelta(days=1)
+                if (now - base).days > 20:
+                    break
+            h = rng.choice(peak_pool)
+            uid = rng.choice(["usr_ana", "usr_ivan"])
+            hours = rng.choice([1, 1, 1, 1, 2])
+            starts = base.replace(hour=h, minute=0, second=0, microsecond=0)
+            ends = starts + timedelta(hours=hours)
+            db.add(Reservation(
+                id=f"rsv_h_{n:03d}",
+                user_id=uid,
+                court_id=court_id,
+                starts_at=starts,
+                ends_at=ends,
+                paid_eur=round(court.price_per_hour_eur * hours, 2),
+                paid_points=0,
+                status="completed" if starts < now else "confirmed",
+            ))
+            n += 1
+
+
 def seed_all(db: Session) -> None:
     _ensure_users(db)
     _ensure_parking(db)
@@ -363,4 +413,5 @@ def seed_all(db: Session) -> None:
     _ensure_loyalty(db)
     _ensure_reservations(db)
     _ensure_rich_history(db)
+    _ensure_court_history(db)
     db.commit()

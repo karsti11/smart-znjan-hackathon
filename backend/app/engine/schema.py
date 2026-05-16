@@ -237,3 +237,45 @@ class AdminStats(BaseModel):
     categories: CategoryDistribution
     top_locations: TopLocations
     period_days: int
+
+
+# ── Citizen insights (lighter, plain-language framing) ──────────────────────
+
+
+class CitizenParkingInsights(BaseModel):
+    busiest_hour: int
+    quietest_hour: int
+    busiest_dow: int           # 0 = Monday
+    quietest_dow: int
+    density_by_hour: list[int]  # 24, normalized 0-100
+    total_events: int
+    tip: str
+
+
+class CourtSportDemand(BaseModel):
+    sport: str
+    sport_label: str
+    most_booked_court_id: str
+    most_booked_court_name: str
+    peak_hour: int
+    peak_dow: int
+    reservation_count: int
+    tip: str
+
+
+class CitizenCourtsInsights(BaseModel):
+    items: list[CourtSportDemand]
+
+
+class CitizenProblemLocation(BaseModel):
+    location: str
+    cleanliness_score: int
+    top_issue: str
+    note: str
+
+
+class CitizenInsights(BaseModel):
+    parking: CitizenParkingInsights
+    courts: CitizenCourtsInsights
+    problem_locations: list[CitizenProblemLocation]
+    period_days: int

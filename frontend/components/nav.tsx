@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
   BarChart3,
   CircleParking,
   Lightbulb,
@@ -21,6 +22,7 @@ const CITIZEN_NAV = [
   { href: "/citizen/parking", label: "Parking", icon: CircleParking },
   { href: "/citizen/tereni", label: "Sportski tereni", icon: Volleyball },
   { href: "/citizen/prijava", label: "Prijava problema", icon: Megaphone },
+  { href: "/citizen/zauzetost", label: "Zauzetost", icon: Activity },
   { href: "/citizen/loyalty", label: "Loyalty", icon: Trophy },
 ];
 

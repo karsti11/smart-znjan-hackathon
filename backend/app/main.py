@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import admin, courts, infra, issues, loyalty, parking, users
+from .api import admin, courts, infra, insights, issues, loyalty, parking, users
 from .config import settings
 from .db.session import Base, SessionLocal, engine
 from .seed.demo import seed_all
@@ -44,6 +44,7 @@ app.include_router(issues.router)
 app.include_router(loyalty.router)
 app.include_router(infra.router)
 app.include_router(admin.router)
+app.include_router(insights.router)
 
 
 @app.get("/")

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  Activity,
   ArrowRight,
   CircleParking,
   Megaphone,
@@ -113,6 +114,12 @@ export default function Home() {
           icon={Trophy}
           title="Loyalty"
           desc="Zaradi bodove i iskoristi ih za parking i terene."
+        />
+        <ModuleCard
+          href="/citizen/zauzetost"
+          icon={Activity}
+          title="Zauzetost & uvidi"
+          desc="Kad su parkinzi puni, koji su tereni najtraženiji, gdje najčešće zovu po popravak."
         />
         <Card className="md:col-span-2">
           <CardContent className="space-y-3">
