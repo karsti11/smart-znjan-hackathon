@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 
 from ..db.models import Issue, LoyaltyEvent, User
 from ..db.session import get_db
-from ..engine.ai import classify_issue
+from ..engine.ai import classify_issue, corrections_count, record_correction
 from ..engine.schema import (
     IssueCreateRequest,
     IssueOut,
+    IssueOverrideRequest,
     IssueStatusUpdate,
 )
 from .common import new_id
@@ -19,6 +20,12 @@ router = APIRouter(prefix="/api/v1/issues", tags=["issues"])
 
 
 SEVERITY_POINTS = {"low": 15, "medium": 30, "high": 40, "critical": 50}
+
+
+@router.get("/corrections-count")
+def get_corrections_count() -> dict[str, int]:
+    """How many staff overrides are currently feeding back into the AI."""
+    return {"count": corrections_count()}
 
 
 @router.get("", response_model=list[IssueOut])
@@ -82,6 +89,30 @@ def update_status(issue_id: str, body: IssueStatusUpdate, db: Session = Depends(
     if not issue:
         raise HTTPException(404, "Issue not found")
     issue.status = body.status
+    db.commit()
+    db.refresh(issue)
+    return issue
+
+
+@router.put("/{issue_id}/override", response_model=IssueOut)
+def override(issue_id: str, body: IssueOverrideRequest, db: Session = Depends(get_db)) -> Issue:
+    """Staff override of AI classification. Mutates the issue and feeds the
+    correction back into the in-memory learning store for future requests."""
+    issue = db.get(Issue, issue_id)
+    if not issue:
+        raise HTTPException(404, "Issue not found")
+    record_correction(
+        description=issue.description,
+        ai_category=issue.category,
+        ai_severity=issue.severity,
+        fixed_category=body.category,
+        fixed_severity=body.severity,
+        staff_note=body.note,
+    )
+    issue.category = body.category
+    issue.severity = body.severity
+    issue.priority_score = {"low": 25, "medium": 50, "high": 75, "critical": 95}[body.severity]
+    issue.ai_grounded = False  # mark this row as human-curated now
     db.commit()
     db.refresh(issue)
     return issue

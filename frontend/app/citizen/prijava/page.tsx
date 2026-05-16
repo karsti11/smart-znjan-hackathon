@@ -71,6 +71,7 @@ export default function PrijavaPage() {
   const [error, setError] = useState<string | null>(null);
   const [last, setLast] = useState<Issue | null>(null);
   const [mine, setMine] = useState<Issue[]>([]);
+  const [learnedFromCount, setLearnedFromCount] = useState<number>(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function loadMine() {
@@ -109,6 +110,11 @@ export default function PrijavaPage() {
         photo_data_url: photo,
       });
       setLast(created);
+      // How many staff corrections fed into this classification — best-effort
+      try {
+        const { count } = await api.correctionsCount();
+        setLearnedFromCount(count);
+      } catch { /* ignore */ }
       await loadMine();
       await refresh();
       setDescription("");
@@ -243,6 +249,12 @@ export default function PrijavaPage() {
                 <div className="rounded-xl bg-teal-400/10 border border-teal-400/20 px-3 py-2 text-sm text-teal-100">
                   +{last.points_awarded} bodova dodano na tvoj račun
                 </div>
+                {learnedFromCount > 0 && (
+                  <div className="rounded-xl bg-white/[0.04] border border-white/10 px-3 py-2 text-xs text-ink-100">
+                    <Sparkles className="h-3 w-3 inline text-teal-300 mr-1" />
+                    AI je u ovu procjenu uključio <strong className="text-teal-200">{learnedFromCount}</strong> ispravak/ispravaka koje su unijeli gradski stručnjaci.
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

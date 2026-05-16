@@ -135,6 +135,13 @@ class IssueStatusUpdate(BaseModel):
     status: IssueStatus
 
 
+class IssueOverrideRequest(BaseModel):
+    """Staff override of an AI classification. Becomes a training example."""
+    category: IssueCategory
+    severity: IssueSeverity
+    note: str = ""
+
+
 class LoyaltyEventOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str

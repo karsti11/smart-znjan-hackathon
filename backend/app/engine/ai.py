@@ -96,6 +96,75 @@ COACH_TOOL: dict[str, Any] = {
 }
 
 
+# ── Iterative learning store (in-memory, demo-grade) ─────────────────────────
+#
+# Whenever staff overrides AI's classification we record the original description
+# + the human-corrected category/severity. The next time `classify_issue` runs:
+#   - Claude path: we inject the recent corrections into the system prompt as
+#     few-shot expert hints.
+#   - Heuristic path: we look for token overlap with a recorded correction and
+#     return its corrected values directly (so the demo works without an API key).
+#
+# Capped at the most recent N entries; module-level so it persists for the life
+# of the backend process. Backend restart = clean slate.
+
+_CORRECTIONS: list[dict[str, str]] = []
+_CORRECTION_LIMIT = 8
+
+
+def record_correction(
+    *, description: str, ai_category: str, ai_severity: str,
+    fixed_category: str, fixed_severity: str, staff_note: str = "",
+) -> None:
+    _CORRECTIONS.append({
+        "description": description.strip(),
+        "ai_category": ai_category,
+        "ai_severity": ai_severity,
+        "fixed_category": fixed_category,
+        "fixed_severity": fixed_severity,
+        "staff_note": staff_note.strip(),
+    })
+    # Keep only the newest N
+    while len(_CORRECTIONS) > _CORRECTION_LIMIT:
+        _CORRECTIONS.pop(0)
+
+
+def corrections_count() -> int:
+    return len(_CORRECTIONS)
+
+
+def _corrections_prompt_block() -> str:
+    if not _CORRECTIONS:
+        return ""
+    lines = [
+        "Nedavni ispravci gradskih stručnjaka — koristi ih kao referencu kad nova prijava sliči na njih:",
+    ]
+    for c in _CORRECTIONS[-5:]:
+        note = f" (napomena: {c['staff_note']})" if c['staff_note'] else ""
+        lines.append(
+            f"- Opis: \"{c['description'][:160]}\" · AI je rekao {c['ai_category']}/{c['ai_severity']} "
+            f"· Točno je {c['fixed_category']}/{c['fixed_severity']}{note}"
+        )
+    return "\n".join(lines) + "\n\n"
+
+
+def _tokens(s: str) -> set[str]:
+    return {t for t in re.findall(r"[\wčćžšđČĆŽŠĐ]+", s.lower()) if len(t) >= 4}
+
+
+def _matching_correction(description: str) -> dict[str, str] | None:
+    """Return the best-matching correction by token overlap, or None."""
+    tokens = _tokens(description)
+    if not tokens:
+        return None
+    best: tuple[int, dict[str, str]] | None = None
+    for c in _CORRECTIONS:
+        overlap = len(tokens & _tokens(c["description"]))
+        if overlap >= 2 and (best is None or overlap > best[0]):
+            best = (overlap, c)
+    return best[1] if best else None
+
+
 # ── Fallbacks (no API key) ───────────────────────────────────────────────────
 
 _KEYWORDS = {
@@ -112,20 +181,27 @@ _KEYWORDS = {
 
 
 def _heuristic_classify(description: str) -> IssueClassification:
-    d = description.lower()
-    category = "ostalo"
-    for cat, keys in _KEYWORDS.items():
-        if any(k in d for k in keys):
-            category = cat
-            break
+    # Iterative learning (offline path): if a recent staff correction looks like
+    # this report, use the corrected values directly.
+    learned = _matching_correction(description)
+    if learned:
+        category = learned["fixed_category"]
+        severity = learned["fixed_severity"]
+    else:
+        d = description.lower()
+        category = "ostalo"
+        for cat, keys in _KEYWORDS.items():
+            if any(k in d for k in keys):
+                category = cat
+                break
 
-    severity = "medium"
-    if any(w in d for w in ["hitno", "opasno", "puknu", "krv", "ozlje", "kratak spoj"]):
-        severity = "critical"
-    elif any(w in d for w in ["danima", "stalno", "veliko", "duboko"]):
-        severity = "high"
-    elif any(w in d for w in ["malo", "sitno"]):
-        severity = "low"
+        severity = "medium"
+        if any(w in d for w in ["hitno", "opasno", "puknu", "krv", "ozlje", "kratak spoj"]):
+            severity = "critical"
+        elif any(w in d for w in ["danima", "stalno", "veliko", "duboko"]):
+            severity = "high"
+        elif any(w in d for w in ["malo", "sitno"]):
+            severity = "low"
 
     priority = {"low": 25, "medium": 50, "high": 75, "critical": 95}[severity]
 
@@ -226,13 +302,15 @@ def classify_issue(description: str, location_hint: str, photo_data_url: str | N
     })
 
     try:
+        system_prompt = (
+            "Ti si asistent gradske uprave Splita za područje Žnjana. "
+            "Cilj ti je brzo i točno klasificirati prijave građana i usmjeriti ih na pravi odjel.\n\n"
+            + _corrections_prompt_block()
+        )
         msg = _client().messages.create(
             model=settings.anthropic_model,
             max_tokens=1024,
-            system=(
-                "Ti si asistent gradske uprave Splita za područje Žnjana. "
-                "Cilj ti je brzo i točno klasificirati prijave građana i usmjeriti ih na pravi odjel."
-            ),
+            system=system_prompt,
             tools=[CLASSIFY_TOOL],
             tool_choice={"type": "tool", "name": "classify_issue"},
             messages=[{"role": "user", "content": content}],

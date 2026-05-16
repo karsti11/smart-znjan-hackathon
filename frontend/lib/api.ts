@@ -75,6 +75,12 @@ export const api = {
     }),
   reclassify: (id: string) =>
     jsonFetch<Issue>(`${BASE}/issues/${id}/reclassify`, { method: "POST" }),
+  overrideIssue: (id: string, body: { category: string; severity: string; note?: string }) =>
+    jsonFetch<Issue>(`${BASE}/issues/${id}/override`, {
+      method: "PUT",
+      body: JSON.stringify({ note: "", ...body }),
+    }),
+  correctionsCount: () => jsonFetch<{ count: number }>(`${BASE}/issues/corrections-count`),
 
   // loyalty
   loyaltyEvents: (uid: string) => jsonFetch<LoyaltyEvent[]>(`${BASE}/loyalty/events/${uid}`),
