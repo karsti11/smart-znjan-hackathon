@@ -11,29 +11,45 @@ komunalne prijave, loyalty program, javna rasvjeta i navodnjavanje.
 - **Node.js 18+** s npm
 - (Opcionalno) `ANTHROPIC_API_KEY` — bez njega aplikacija radi s offline heuristikom
 
-## Brzi start
+## Pokretanje (klon-i-radi)
 
-### Backend (FastAPI, port 8081)
+Trebaš **dva terminala**: jedan za backend (port 8081), jedan za frontend (port 3001).
+Backend mora biti up prije nego otvoriš stranice — frontend mu rewrita `/api/*`.
+
+### 0. Kloniraj repo
+
+```powershell
+git clone https://github.com/karsti11/smart-znjan-hackathon.git
+cd smart-znjan-hackathon
+```
+
+### Terminal 1 — Backend (FastAPI, port 8081)
 
 ```powershell
 cd backend
 python -m venv .venv
-.venv\Scripts\activate           # Windows (PowerShell/cmd)
-# source .venv/bin/activate       # macOS / Linux
+.venv\Scripts\activate            # Windows (PowerShell/cmd)
+# source .venv/bin/activate        # macOS / Linux
 
 pip install -r requirements.txt
-
-# (opcionalno) za stvarni Claude:
-copy .env.example .env           # Windows
-# cp .env.example .env            # macOS / Linux
-# zatim u .env upiši ANTHROPIC_API_KEY=sk-...
-
 uvicorn app.main:app --reload --port 8081
 ```
 
-Bez `ANTHROPIC_API_KEY` aplikacija koristi offline heuristike — demo radi.
+Pričekaj liniju `Uvicorn running on http://127.0.0.1:8081`. SQLite baza i demo
+podaci (korisnici, parkinzi, tereni, prijave) kreiraju se automatski pri prvom
+pokretanju (`smart_znjan.db` u `backend/`).
 
-### Frontend (Next.js, port 3001)
+**Opcionalno — za stvarni Claude** (umjesto offline heuristike):
+
+```powershell
+copy .env.example .env            # Windows
+# cp .env.example .env             # macOS / Linux
+# zatim u .env upiši ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Bez ključa app **i dalje radi** — koristi keyword heuristike za klasifikaciju prijava i coach poruke.
+
+### Terminal 2 — Frontend (Next.js, port 3001)
 
 ```powershell
 cd frontend
@@ -41,8 +57,25 @@ npm install
 npm run dev
 ```
 
-Otvori `http://localhost:3001`. Backend mora biti pokrenut paralelno na portu 8081
-(Next.js rewrita `/api/*` → `http://127.0.0.1:8081/api/*`, vidi `next.config.ts`).
+Pričekaj `Local: http://localhost:3001`, pa otvori taj URL u browseru.
+
+### Provjera da sve radi
+
+- http://localhost:8081/api/v1/health → `{"status":"ok","ai":false}` (ili `true` s API key)
+- http://localhost:8081/docs → Swagger UI s 20+ ruta
+- http://localhost:3001 → naslovnica s karticama modula
+
+## Što ako ne radi
+
+| Problem | Rješenje |
+|---|---|
+| `python` ne radi (macOS/Linux) | Koristi `python3` i `python3 -m venv .venv` |
+| `ModuleNotFoundError: fastapi` u uvicornu | Aktiviraj venv prije pokretanja: `.venv\Scripts\activate` |
+| `Port 8081 already in use` | Drugi backend već radi: `Get-Process python \| Stop-Process` ili promijeni `--port 8082` (+ update `frontend/next.config.ts`) |
+| `Port 3001 already in use` | `Get-Process node \| Stop-Process` ili `npx next dev -p 3002` |
+| Naslovnica prazna, console: `Failed to fetch /api/v1/...` | Backend nije pokrenut ili je na pogrešnom portu — provjeri Terminal 1 |
+| `npm install` puca na `node-gyp` (Windows) | Instaliraj [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) (workload "Desktop development with C++") |
+| CORS error u browseru | Frontend mora biti na 3001 — to je već dozvoljeno u `backend/.env.example` (`CORS_ORIGINS`) |
 
 ## Demo flow (5 min)
 
