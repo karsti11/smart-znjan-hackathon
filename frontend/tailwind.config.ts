@@ -21,40 +21,42 @@ const config: Config = {
         ],
       },
       colors: {
-        // Smart Žnjan palette — noćni Split: tamno more + teal odsjaj
+        // Smart Žnjan palette — sunčani Mediteran: bijela, žuta, narančasta
+        // Token names `ink`/`teal` kept for class compatibility, hex values are
+        // now warm neutrals + bright yellow so we don't have to rename usages.
         ink: {
-          50:  "#e6edf7",
-          100: "#c5d3e8",
-          200: "#9ab1d4",
-          300: "#6c8cbb",
-          400: "#3f6ba5",
-          500: "#1f4d8a",
-          600: "#143a6e",
-          700: "#0d2a55",
-          800: "#081d3d",
-          900: "#04122a",
-          950: "#020a1a",
-        },
-        teal: {
-          300: "#7ce2d7",
-          400: "#3fd5c6",
-          500: "#1fbfae",
-          600: "#0ea592",
-          700: "#0b7e72",
-        },
-        coral: {
-          400: "#ff8a5b",
-          500: "#ff6b3d",
-        },
-        sand: {
+          50:  "#ffffff",
+          100: "#fff8e7",
           200: "#f3e7c8",
           300: "#e6d39c",
+          400: "#c9a86a",
+          500: "#8a6a3a",
+          600: "#5c3f1a",
+          700: "#3a2810",
+          800: "#1f1408",
+          900: "#110a04",
+          950: "#050200",
+        },
+        teal: {
+          300: "#ffe066",
+          400: "#ffd400",
+          500: "#ffb800",
+          600: "#e09a00",
+          700: "#b87a00",
+        },
+        coral: {
+          400: "#ff8a3d",
+          500: "#ff6a1a",
+        },
+        sand: {
+          200: "#fff4d6",
+          300: "#ffe9a8",
         },
       },
       boxShadow: {
-        glow: "0 0 24px rgba(63, 213, 198, 0.25)",
-        "glow-lg": "0 0 60px rgba(63, 213, 198, 0.18)",
-        card: "0 6px 28px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(126, 226, 215, 0.08)",
+        glow: "0 0 24px rgba(255, 212, 0, 0.30)",
+        "glow-lg": "0 0 60px rgba(255, 184, 0, 0.22)",
+        card: "0 6px 28px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 224, 102, 0.10)",
       },
       keyframes: {
         "fade-in": {
@@ -66,8 +68,8 @@ const config: Config = {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 14px 1px rgba(63, 213, 198, 0.18)" },
-          "50%":      { boxShadow: "0 0 20px 2px rgba(63, 213, 198, 0.30)" },
+          "0%, 100%": { boxShadow: "0 0 14px 1px rgba(255, 212, 0, 0.22)" },
+          "50%":      { boxShadow: "0 0 20px 2px rgba(255, 184, 0, 0.36)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -88,9 +90,9 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-night":
-          "radial-gradient(at 18% 4%, rgba(63, 213, 198, 0.14) 0px, transparent 45%), radial-gradient(at 85% 0%, rgba(31, 77, 138, 0.45) 0px, transparent 55%), radial-gradient(at 92% 92%, rgba(255, 138, 91, 0.10) 0px, transparent 55%), linear-gradient(180deg, #04122a 0%, #02091a 100%)",
+          "radial-gradient(at 18% 4%, rgba(255, 224, 102, 0.18) 0px, transparent 45%), radial-gradient(at 85% 0%, rgba(255, 138, 61, 0.30) 0px, transparent 55%), radial-gradient(at 92% 92%, rgba(255, 184, 0, 0.18) 0px, transparent 55%), linear-gradient(180deg, #110a04 0%, #050200 100%)",
         shimmer:
-          "linear-gradient(110deg, rgba(126,226,215,0) 0%, rgba(126,226,215,0.18) 45%, rgba(126,226,215,0) 100%)",
+          "linear-gradient(110deg, rgba(255,224,102,0) 0%, rgba(255,224,102,0.22) 45%, rgba(255,224,102,0) 100%)",
       },
     },
   },

@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { Badge, Card, CardContent, Metric } from "@/components/ui";
-import { HeroVideo } from "@/components/hero-video";
 import { api } from "@/lib/api";
 import { useRole } from "@/lib/role-context";
 import type { AdminKpis } from "@/lib/types";
@@ -36,54 +35,44 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-3xl glass animate-slide-up min-h-[460px]">
-        <HeroVideo />
-        <div className="absolute -top-24 -right-32 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl animate-wave-slow pointer-events-none z-[1]" />
-        <div className="absolute -bottom-32 -left-32 h-72 w-72 rounded-full bg-coral-500/10 blur-3xl animate-wave-slow pointer-events-none z-[1]" />
+      <section className="relative animate-slide-up py-6">
+        <Badge tone="teal" className="mb-4">
+          <Sparkles className="h-3 w-3" /> AI hackathon · {aiReady ? "Claude online" : "offline fallback"}
+        </Badge>
 
-        <div className="relative z-[2] p-10">
-          <Badge tone="teal" className="mb-4">
-            <Sparkles className="h-3 w-3" /> AI hackathon · {aiReady ? "Claude online" : "offline fallback"}
-          </Badge>
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-sand-200 text-balance max-w-2xl drop-shadow-[0_2px_24px_rgba(2,9,26,0.75)]">
+          Pametni Žnjan koji <span className="text-coral-400">diše s gradom</span>.
+        </h1>
+        <p className="mt-4 text-sand-200/90 max-w-xl text-balance drop-shadow-[0_1px_8px_rgba(2,9,26,0.8)]">
+          Parking u stvarnom vremenu, rezervacija sportskih terena, prijava komunalnih problema
+          uz AI klasifikaciju i loyalty bodovi koji vraćaju vrijednost građanima.
+        </p>
 
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-ink-50 text-balance max-w-2xl drop-shadow-[0_2px_24px_rgba(2,9,26,0.6)]">
-            Pametan Žnjan koji <span className="text-teal-300">diše s gradom</span>.
-          </h1>
-          <p className="mt-4 text-ink-100 max-w-xl text-balance drop-shadow-[0_1px_8px_rgba(2,9,26,0.7)]">
-            Parking u stvarnom vremenu, rezervacija sportskih terena, prijava komunalnih problema
-            uz AI klasifikaciju i loyalty bodovi koji vraćaju vrijednost građanima.
-          </p>
-
-          {user && (
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-3 rounded-2xl px-4 py-3 bg-white/[0.08] border border-white/15 backdrop-blur-md">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-teal-400/40 to-ink-700 flex items-center justify-center text-lg">
-                  {user.avatar_emoji}
-                </div>
-                <div>
-                  <div className="text-sm text-ink-50">Dobrodošli, {user.name.split(" ")[0]}</div>
-                  <div className="text-xs text-teal-300">{formatPoints(user.points)} dostupno</div>
-                </div>
+        {user && (
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3 rounded-2xl px-4 py-3 bg-white/[0.08] border border-white/15 backdrop-blur-md">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-coral-400/50 to-ink-700 flex items-center justify-center text-lg">
+                {user.avatar_emoji}
               </div>
-              <Link
-                href="/citizen/prijava"
-                className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-teal-500 text-ink-950 font-medium hover:bg-teal-400 transition-all shadow-glow"
-              >
-                <Megaphone className="h-4 w-4" /> Prijavi problem
-              </Link>
-              <Link
-                href="/citizen/loyalty"
-                className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-white/[0.08] border border-white/15 backdrop-blur-md text-ink-100 hover:bg-white/[0.14] transition-all"
-              >
-                <Trophy className="h-4 w-4" /> Loyalty coach <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div>
+                <div className="text-sm text-sand-200">Dobrodošli, {user.name.split(" ")[0]}</div>
+                <div className="text-xs text-coral-400">{formatPoints(user.points)} dostupno</div>
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="absolute bottom-3 right-4 z-[2] text-[10px] tracking-wide text-ink-200/50 select-none">
-          Video: Grad Split · projekt obnove Žnjana
-        </div>
+            <Link
+              href="/citizen/prijava"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-coral-500 text-ink-950 font-medium hover:bg-coral-400 transition-all shadow-glow"
+            >
+              <Megaphone className="h-4 w-4" /> Prijavi problem
+            </Link>
+            <Link
+              href="/citizen/loyalty"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-white/[0.08] border border-white/15 backdrop-blur-md text-sand-200 hover:bg-white/[0.14] transition-all"
+            >
+              <Trophy className="h-4 w-4" /> Loyalty coach <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
